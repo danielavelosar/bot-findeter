@@ -20,10 +20,7 @@ const generateJsonParse = (info: string) => {
     
     {
         "name": "Leifer",
-        "interest": "n/a",
-        "value": "0",
         "email": "fef@fef.com",
-        "startDate": "2024/02/15 00:00:00"
     }
     
     Objeto JSON a generar:`
@@ -36,7 +33,7 @@ const generateJsonParse = (info: string) => {
  */
 const flowConfirm = addKeyword(EVENTS.ACTION).addAction(async (_, { flowDynamic }) => {
     await flowDynamic('Ok, voy a pedirte unos datos para agendar')
-    await flowDynamic('¿Cual es tu nombre?')
+    await flowDynamic('¿Cual es el nombre de la asociación a quien representas?')
 }).addAction({ capture: true }, async (ctx, { state, flowDynamic, extensions }) => {
     await state.update({ name: ctx.body })
     const ai = extensions.ai as AIClass
@@ -48,15 +45,12 @@ const flowConfirm = addKeyword(EVENTS.ACTION).addAction(async (_, { flowDynamic 
         }
     ], 'gpt-4')
 
-    await handleHistory({ content: text, role: 'assistant' }, state)
-    await flowDynamic(`¿Me confirmas fecha y hora?: ${text}`)
-    await state.update({ startDate: text })
 })
     .addAction({ capture: true }, async (ctx, { state, flowDynamic }) => {
-        await flowDynamic(`Ultima pregunta ¿Cual es tu email?`)
+        await flowDynamic(`Ultima pregunta ¿A qué email quieres que mande el correo?`)
     })
     .addAction({ capture: true }, async (ctx, { state, extensions, flowDynamic }) => {
-        const infoCustomer = `Name: ${state.get('name')}, StarteDate: ${state.get('startDate')}, email: ${ctx.body}`
+        const infoCustomer = `Name: ${state.get('name')}, email: ${ctx.body}`
         const ai = extensions.ai as AIClass
 
         const text = await ai.createChat([
@@ -68,7 +62,7 @@ const flowConfirm = addKeyword(EVENTS.ACTION).addAction(async (_, { flowDynamic 
 
         await appToCalendar(text)
         clearHistory(state)
-        await flowDynamic('Listo! agendado Buen dia')
+        await flowDynamic('¡Listo! se le enviará un correo, ¡Buen día!')
     })
 
 export { flowConfirm }

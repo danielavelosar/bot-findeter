@@ -13,17 +13,18 @@ export default async (_: BotContext, { state, gotoFlow, extensions }: BotMethods
     const history = getHistoryParse(state)
     const prompt = `Como una inteligencia artificial avanzada, tu tarea es analizar el contexto de una conversación y determinar cuál de las siguientes acciones es más apropiada para realizar:
     --------------------------------------------------------
+    Eres parte de una empresa que otorga créditos de segundo nivel (a asociaciones, cooperativas, etc.). El cliente previamente ha otorgado diferentes datos para que la empresa sepa su riesgo de préstamo, la empresa llena un excel con los riesgos calculados del cliente pero se demora un tiempo porque esto se calcula con empleados humanos de la empresa
     Historial de conversación:
     {HISTORY}
     
     Posibles acciones a realizar:
-    1. AGENDAR: Esta acción se debe realizar cuando el cliente expresa su deseo de programar una cita.
+    1. CONSULTAR: Esta acción se debe realizar cuando el cliente expresa su deseo de saber su riesgo de crédito.
     2. HABLAR: Esta acción se debe realizar cuando el cliente desea hacer una pregunta o necesita más información.
-    3. CONFIRMAR: Esta acción se debe realizar cuando el cliente y el vendedor llegaron a un acuerdo mutuo proporcionando una fecha, dia y hora exacta sin conflictos de hora.
+    3. ENVIAR_CORREO: Esta acción se debe realizar cuando el cliente expresa querer que se le envíe por correo la información detallada sobre cómo mejorar su puntaje de crédito basado en confianza.
     -----------------------------
     Tu objetivo es comprender la intención del cliente y seleccionar la acción más adecuada en respuesta a su declaración.
     
-    Respuesta ideal (AGENDAR|HABLAR|CONFIRMAR):`.replace('{HISTORY}', history)
+    Respuesta ideal (CONSULTAR|HABLAR|ENVIAR_CORREO):`.replace('{HISTORY}', history)
 
     const text = await ai.createChat([
         {
@@ -32,7 +33,7 @@ export default async (_: BotContext, { state, gotoFlow, extensions }: BotMethods
         }
     ])
 
-    if (text.includes('HABLAR')) return gotoFlow(flowSeller)
-    if (text.includes('AGENDAR')) return gotoFlow(flowSchedule)
-    if (text.includes('CONFIRMAR')) return gotoFlow(flowConfirm)
+    if ((text as string).includes('HABLAR')) return gotoFlow(flowSeller)
+    if ((text as string).includes('CONSULTAR')) return gotoFlow(flowSchedule)
+    if ((text as string).includes('ENVIAR_CORREO')) return gotoFlow(flowConfirm)
 }
